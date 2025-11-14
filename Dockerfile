@@ -29,7 +29,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
   
   # Stage 3: Runtime
-FROM eclipse-temurin:17-jre-alpine
+FROM maven:3.9-eclipse-temurin-21
 WORKDIR /app
   
   # Copy the built JAR file
