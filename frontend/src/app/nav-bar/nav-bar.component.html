@@ -1,0 +1,59 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-logo">
+      <a routerLink="/">
+        <span class="logo-icon">❤️</span>
+        <span class="logo-text">DonorConnect</span>
+      </a>
+    </div>
+
+    <!-- Desktop Menu -->
+    <ul class="navbar-menu" [class.active]="isMenuOpen">
+      <li class="nav-item">
+        <a routerLink="/"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: true}"
+           (click)="closeMenu()">
+          Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/impact-stories"
+           routerLinkActive="active"
+           (click)="closeMenu()">
+          Impact Stories
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/dashboard"
+           routerLinkActive="active"
+           (click)="closeMenu()">
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/about"
+           routerLinkActive="active"
+           (click)="closeMenu()">
+          About
+        </a>
+      </li>
+      <li class="nav-item-cta">
+        <button class="btn-donate" (click)="navigateToDonate()">
+          Donate Now
+        </button>
+      </li>
+    </ul>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="navbar-toggle"
+            (click)="toggleMenu()"
+            [class.active]="isMenuOpen"
+            aria-label="Toggle menu">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+  </div>
+</nav>
