@@ -1,10 +1,10 @@
 <div class="quiz-container">
   <!-- Welcome Screen -->
   <div *ngIf="!quizStarted" class="welcome-screen">
-    <h1>🎯 Jeu de Quiz</h1>
-    <p>Testez vos connaissances avec {{ questions.length }} questions!</p>
+    <h1>Quiz</h1>
+    <p>Test your knowledge with {{ questions.length }} questions!</p>
     <button class="btn btn-primary" (click)="startQuiz()">
-      Commencer le Quiz
+      Start the Quiz!
     </button>
   </div>
 
@@ -42,14 +42,14 @@
         class="btn btn-secondary"
         (click)="previousQuestion()"
         [disabled]="currentQuestionIndex === 0">
-        ← Précédent
+        ← Previous
       </button>
 
       <button
         class="btn btn-primary"
         (click)="nextQuestion()"
         [disabled]="selectedAnswer === null">
-        {{ currentQuestionIndex === questions.length - 1 ? 'Terminer' : 'Suivant →' }}
+        {{ currentQuestionIndex === questions.length - 1 ? 'End' : 'Next →' }}
       </button>
     </div>
   </div>
@@ -66,17 +66,17 @@
 
       <div class="result-details">
         <div class="result-item">
-          <span class="result-label">Réponses correctes:</span>
+          <span class="result-label">Good answer :</span>
           <span class="result-value correct">{{ score }}</span>
         </div>
         <div class="result-item">
-          <span class="result-label">Réponses incorrectes:</span>
+          <span class="result-label">Wrong Answer:</span>
           <span class="result-value incorrect">{{ questions.length - score }}</span>
         </div>
       </div>
 
       <button class="btn btn-primary" (click)="restartQuiz()">
-        🔄 Recommencer le Quiz
+        🔄 Restart quiz
       </button>
     </div>
   </div>
