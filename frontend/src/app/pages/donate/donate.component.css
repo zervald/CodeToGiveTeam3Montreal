@@ -93,11 +93,17 @@ button:focus {
   outline-offset: 2px;
 }
 
-/* Number input styling */
+/* Number input styling - Remove arrows/spin buttons */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
-  height: 40px;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* Remove default transitions for slider to make it more responsive */

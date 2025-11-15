@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-gradient-to-br from-purple-100 to-purple-200 py-12 px-4">
   <div class="max-w-md mx-auto">
     <!-- Back Button -->
-    <button 
+    <button
       (click)="goToHome()"
       class="mb-4 flex items-center gap-2 text-[#4c4357] hover:text-[#BEA8DA] transition-colors font-medium group">
       <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,11 +12,11 @@
 
     <!-- Header -->
     <div class="text-center bg-[#4c4357] text-white p-12 rounded-3xl mb-6 shadow-lg">
-      <h1 class="text-4xl font-bold mb-3">💝 Don</h1>
+      <h1 class="text-4xl font-bold mb-3">Donate to help us!!</h1>
       <div class="flex items-center justify-center gap-2 mb-2">
-        <input 
-          type="number" 
-          [(ngModel)]="totalAmount" 
+        <input
+          type="number"
+          [(ngModel)]="totalAmount"
           (ngModelChange)="calculateRemaining()"
           class="bg-white/20 text-white text-3xl font-bold text-center w-32 px-4 py-2 rounded-full border-2 border-white/30 focus:outline-none focus:border-white/60 transition-all"
           min="0"
@@ -29,19 +29,19 @@
     <!-- Causes List -->
     <div class="bg-[#4c4357] rounded-3xl p-6 mb-4 shadow-lg">
       <h2 class="text-white text-xl font-semibold mb-4">Répartition</h2>
-      
+
       <div class="space-y-4">
-        <div 
-          *ngFor="let cause of causes" 
+        <div
+          *ngFor="let cause of causes"
           class="bg-[#9886ae] rounded-2xl p-4 transition-all hover:shadow-lg hover:scale-[1.02]">
-          
+
           <!-- Cause Header -->
           <div class="flex items-center justify-between mb-3">
             <div class="flex-1">
               <h3 class="text-white font-semibold text-lg">{{ cause.name }}</h3>
               <p class="text-white/70 text-sm">{{ formatCurrency(getCauseAmount(cause)) }} $</p>
             </div>
-            <button 
+            <button
               *ngIf="causes.length > 1"
               (click)="removeCause(cause.id)"
               class="text-white/60 hover:text-white transition-colors ml-2 text-xl leading-none hover:scale-110"
@@ -52,10 +52,10 @@
 
           <!-- Slider -->
           <div class="mb-2">
-            <input 
-              type="range" 
-              min="0" 
-              max="100" 
+            <input
+              type="range"
+              min="0"
+              max="100"
               [value]="cause.percentage"
               (input)="onSliderChange(cause, $event)"
               class="w-full h-2 rounded-full appearance-none cursor-pointer slider"
@@ -65,14 +65,14 @@
           <!-- Percentage Display -->
           <div class="flex justify-between items-center">
             <span class="text-white/80 text-sm">Pourcentage</span>
-            <span class="text-white font-bold text-lg">{{ cause.percentage }}%</span>
+            <span class="text-white font-bold text-lg">{{ cause.percentage | number:'1.0-0' }}%</span>
           </div>
         </div>
       </div>
 
       <!-- Add Cause Button -->
       <div class="mt-4">
-        <button 
+        <button
           *ngIf="!showAddCause"
           (click)="showAddCause = true"
           class="w-full bg-[#6b588e] hover:bg-[#BEA8DA] text-white py-3 px-4 rounded-full font-semibold transition-all hover:scale-105 shadow-md">
@@ -81,20 +81,20 @@
 
         <!-- Add Cause Form -->
         <div *ngIf="showAddCause" class="bg-[#6b588e] rounded-2xl p-4 animate-slideIn">
-          <input 
-            type="text" 
+          <input
+            type="text"
             [(ngModel)]="newCauseName"
             (keyup.enter)="addCause()"
             placeholder="Nom de la cause"
             class="w-full bg-white/20 text-white placeholder-white/50 px-4 py-3 rounded-full mb-3 focus:outline-none focus:bg-white/30 border-2 border-transparent focus:border-white/40 transition-all">
-          
+
           <div class="flex gap-2">
-            <button 
+            <button
               (click)="addCause()"
               class="flex-1 bg-[#BEA8DA] hover:bg-white hover:text-[#4c4357] text-white py-2 px-4 rounded-full font-semibold transition-all hover:scale-105">
               Ajouter
             </button>
-            <button 
+            <button
               (click)="showAddCause = false; newCauseName = ''"
               class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-full font-semibold transition-all">
               Annuler
@@ -110,7 +110,7 @@
         <span class="text-white text-lg">Total des allocations</span>
         <span class="text-white font-bold text-2xl">100%</span>
       </div>
-      
+
       <div class="flex justify-between items-center text-white/80 text-sm">
         <span>Montant total</span>
         <span class="font-semibold text-lg text-white">{{ formatCurrency(getTotalDonation()) }} $</span>
@@ -119,12 +119,12 @@
 
     <!-- Action Buttons -->
     <div class="flex gap-3">
-      <button 
+      <button
         (click)="resetDistribution()"
         class="flex-1 bg-[#6c757d] hover:bg-[#5a6268] text-white py-4 px-6 rounded-full font-semibold transition-all hover:scale-105 shadow-md">
         Réinitialiser
       </button>
-      <button 
+      <button
         (click)="confirmDonation()"
         class="flex-1 bg-[#BEA8DA] hover:bg-[#9886ae] text-white py-4 px-6 rounded-full font-semibold transition-all hover:scale-105 shadow-lg">
         Confirmer le don

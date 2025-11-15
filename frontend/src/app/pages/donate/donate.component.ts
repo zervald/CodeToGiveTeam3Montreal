@@ -19,12 +19,8 @@ interface Cause {
 })
 export class DonateComponent implements OnInit {
   totalAmount: number = 100;
-  causes: Cause[] = [
-    { id: 1, name: 'Éducation', percentage: 40, color: '#BEA8DA' },
-    { id: 2, name: 'Santé', percentage: 30, color: '#9886ae' },
-    { id: 3, name: 'Environnement', percentage: 30, color: '#6b588e' }
-  ];
-  
+  causes: Cause[] = [];
+
   newCauseName: string = '';
   showAddCause: boolean = false;
   remainingPercentage: number = 0;
@@ -38,26 +34,26 @@ export class DonateComponent implements OnInit {
   onSliderChange(cause: Cause, event: Event): void {
     const input = event.target as HTMLInputElement;
     const newValue = parseInt(input.value);
-    
+
     // Calculate the difference
     const difference = newValue - cause.percentage;
-    
+
     // Update the current cause
     cause.percentage = newValue;
-    
+
     // Distribute the difference among other causes proportionally
     if (this.causes.length > 1) {
       const otherCauses = this.causes.filter(c => c.id !== cause.id);
       const totalOtherPercentage = otherCauses.reduce((sum, c) => sum + c.percentage, 0);
-      
+
       if (totalOtherPercentage > 0) {
         otherCauses.forEach(c => {
           const proportion = c.percentage / totalOtherPercentage;
-          c.percentage = Math.max(0, c.percentage - (difference * proportion));
+          c.percentage = Math.round(Math.max(0, c.percentage - (difference * proportion)));
         });
       }
     }
-    
+
     // Normalize to ensure total is 100%
     this.normalizePercentages();
     this.calculateRemaining();
@@ -70,7 +66,7 @@ export class DonateComponent implements OnInit {
       this.causes.forEach(c => {
         c.percentage = Math.round(c.percentage * factor);
       });
-      
+
       // Fix rounding errors
       const newTotal = this.causes.reduce((sum, c) => sum + c.percentage, 0);
       if (newTotal !== 100 && this.causes.length > 0) {
@@ -93,11 +89,11 @@ export class DonateComponent implements OnInit {
         percentage: 0,
         color: colors[this.causes.length % colors.length]
       };
-      
+
       this.causes.push(newCause);
       this.newCauseName = '';
       this.showAddCause = false;
-      
+
       // Redistribute percentages evenly
       this.redistributeEvenly();
     }
@@ -113,11 +109,11 @@ export class DonateComponent implements OnInit {
   redistributeEvenly(): void {
     const perCause = Math.floor(100 / this.causes.length);
     const remainder = 100 % this.causes.length;
-    
+
     this.causes.forEach((cause, index) => {
       cause.percentage = perCause + (index < remainder ? 1 : 0);
     });
-    
+
     this.calculateRemaining();
   }
 
@@ -148,7 +144,7 @@ export class DonateComponent implements OnInit {
         amount: this.getCauseAmount(c)
       }))
     });
-    
+
     alert(`Merci pour votre don de ${this.formatCurrency(this.totalAmount)}$ !`);
   }
 
