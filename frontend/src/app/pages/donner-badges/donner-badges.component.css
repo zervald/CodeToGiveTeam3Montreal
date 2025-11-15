@@ -1,0 +1,132 @@
+.badges-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.badges-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.badges-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.donation-count {
+  margin: 10px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.earned-badges h3,
+.next-badge h3 {
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.badge-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.badge-name {
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+}
+
+.badge-description {
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.next-badge-info {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.next-badge-icon {
+  font-size: 48px;
+}
+
+.next-badge-details {
+  flex: 1;
+}
+
+.next-badge-name {
+  margin: 0;
+  font-weight: bold;
+  color: #333;
+  font-size: 18px;
+}
+
+.next-badge-description {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.no-badges {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 16px;
+}
