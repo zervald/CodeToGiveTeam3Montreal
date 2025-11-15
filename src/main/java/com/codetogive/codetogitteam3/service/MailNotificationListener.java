@@ -4,6 +4,7 @@ import com.codetogive.codetogitteam3.domain.DonationEvent;
 import com.codetogive.codetogitteam3.domain.Subscription;
 import com.codetogive.codetogitteam3.repository.DonationEventRepository;
 import com.codetogive.codetogitteam3.repository.SubscriptionRepository;
+import com.codetogive.codetogitteam3.service.DonationEventService.DonationEventPublished;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class MailNotificationListener {
 
     @Async
     @TransactionalEventListener
-    public void onDonationEventPublished(DonationEventService.DonationEventPublished evt) {
-        DonationEvent ev = eventRepo.findById(evt.getEventId()).orElse(null);
+    public void onDonationEventPublished(DonationEventPublished evt) {
+        DonationEvent ev = eventRepo.findById(evt.eventId()).orElse(null);
         if (ev == null) return;
 
         List<Subscription> recipients = subRepo.findByStatus(Subscription.Status.ACTIVE);
