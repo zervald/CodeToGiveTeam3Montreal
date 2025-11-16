@@ -1,97 +1,91 @@
 <div class="bg-white py-16 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-12">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">Community Impact Leaders</h2>
-          <p class="text-xl text-gray-600">Celebrating the incredible generosity of our supporters</p>
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Community Impact Leaders</h2>
+            <p class="text-xl text-gray-600">Celebrating the incredible generosity of our supporters</p>
         </div>
 
         <!-- Tab Navigation -->
         <div class="flex justify-center mb-8">
-          <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1" role="tablist">
-            <button
-              *ngFor="let tab of tabs"
-              (click)="switchTab(tab.value)"
-              [class.bg-indigo-600]="activeTab === tab.value"
-              [class.text-white]="activeTab === tab.value"
-              [class.text-gray-700]="activeTab !== tab.value"
-              class="px-8 py-3 rounded-lg font-semibold transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              role="tab"
-              [attr.aria-selected]="activeTab === tab.value"
-            >
-              {{ tab.label }}
-            </button>
-          </div>
+            <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1" role="tablist">
+                <button
+                        *ngFor="let tab of tabs"
+                        (click)="switchTab(tab.value)"
+                        [class.bg-indigo-600]="activeTab === tab.value"
+                        [class.text-white]="activeTab === tab.value"
+                        [class.text-gray-700]="activeTab !== tab.value"
+                        class="px-8 py-3 rounded-lg font-semibold transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        role="tab"
+                        [attr.aria-selected]="activeTab === tab.value"
+                >
+                    {{ tab.label }}
+                </button>
+            </div>
         </div>
 
         <!-- Leaderboard List -->
         <div class="space-y-4">
-          <div
-            *ngFor="let donor of currentLeaderboard; let i = index"
-            class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-150 ease-in-out"
-          >
+            <div
+                    *ngFor="let donor of currentLeaderboard; let i = index"
+                    class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-150 ease-in-out"
+            >
 
-            <div class="flex items-center justify-between">
-              <!-- Rank and Avatar -->
-              <div class="flex items-center gap-4 flex-1 min-w-0">
-                <!-- Rank Badge -->
-                <div
-                  [ngClass]="{
-                    'text-yellow-500 font-bold text-2xl': i === 0,
-                    'text-gray-400 font-bold text-2xl': i === 1,
-                    'text-orange-500 font-bold text-2xl': i === 2,
-                    'text-gray-500 font-semibold text-xl': i > 2
-                  }"
-                  class="flex-shrink-0 w-8 text-center"
-                >
-                  {{ i + 1 }}
-                </div>
+                <div class="flex items-center justify-between">
+                    <!-- Rank and Avatar -->
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                        <!-- Rank Badge -->
+                        <div
+                                class="flex-shrink-0 w-8 text-center text-gray-700 font-semibold text-xl"
+                        >
+                            {{ i + 1 }}
+                        </div>
 
-                <!-- Avatar -->
-                <div class="bg-indigo-600 text-white w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
-                  {{ donor.avatar }}
-                </div>
+                        <!-- Avatar -->
+                        <div class="bg-indigo-600 text-white w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                            {{ donor.avatar }}
+                        </div>
 
-                <!-- Donor Info -->
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 truncate mb-1">{{ donor.name }}</h3>
-                  <p class="text-sm font-medium" [class.text-red-500]="i < 3" [class.text-gray-500]="i >= 3">
-                    ${{ donor.amount.toLocaleString() }} donated
-                  </p>
-                </div>
-              </div>
+                        <!-- Donor Info -->
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 truncate mb-1">{{ donor.name }}</h3>
+                            <p class="text-sm font-medium" [class.text-red-500]="i < 3" [class.text-gray-500]="i >= 3">
+                                ${{ donor.amount.toLocaleString() }} donated
+                            </p>
+                        </div>
+                    </div>
 
-              <!-- Badge -->
-              <div class="flex-shrink-0 ml-4">
+                    <!-- Badge -->
+                    <div class="flex-shrink-0 ml-4">
                 <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-indigo-600 text-white whitespace-nowrap">
                   {{ donor.badge }}
                 </span>
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <!-- Empty State -->
-          <div *ngIf="currentLeaderboard.length === 0" class="text-center py-16 bg-white rounded-2xl shadow-md">
-            <p class="text-gray-500 text-lg">No donors yet. Be the first to make an impact!</p>
-          </div>
+            <!-- Empty State -->
+            <div *ngIf="currentLeaderboard.length === 0" class="text-center py-16 bg-white rounded-2xl shadow-md">
+                <p class="text-gray-500 text-lg">No donors yet. Be the first to make an impact!</p>
+            </div>
         </div>
 
         <!-- Community Stats -->
         <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div class="text-3xl font-bold text-gray-900 mb-2">{{ totalDonors }}</div>
-            <div class="text-gray-600 font-medium">Total Donors</div>
-          </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-2">{{ totalDonors }}</div>
+                <div class="text-gray-600 font-medium">Total Donors</div>
+            </div>
 
-          <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div class="text-3xl font-bold text-gray-900 mb-2">${{ totalRaised.toLocaleString() }}</div>
-            <div class="text-gray-600 font-medium">Total Raised</div>
-          </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-2">${{ totalRaised.toLocaleString() }}</div>
+                <div class="text-gray-600 font-medium">Total Raised</div>
+            </div>
 
-          <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div class="text-3xl font-bold text-gray-900 mb-2">{{ familiesHelped }}</div>
-            <div class="text-gray-600 font-medium">Families Helped</div>
-          </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-2">{{ familiesHelped }}</div>
+                <div class="text-gray-600 font-medium">Families Helped</div>
+            </div>
         </div>
-      </div>
     </div>
+</div>
