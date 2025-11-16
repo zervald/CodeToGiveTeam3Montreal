@@ -1,7 +1,9 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, inject } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import { MatIcon} from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 interface Donor {
   name: string;
@@ -38,6 +40,9 @@ interface Tab {
 })
 export class LeaderboardComponent implements OnInit {
   @Output() joinLeaderboard = new EventEmitter<void>();
+
+  private http = inject(HttpClient);
+  private apiBase = environment.apiBase;
 
   activeTab: 'monthly' | 'alltime' = 'monthly';
 
@@ -76,6 +81,27 @@ export class LeaderboardComponent implements OnInit {
   ngOnInit(): void {
     this.switchTab('monthly');
     this.calculateStats();
+    this.testLeaderboardApi();
+  }
+
+  private testLeaderboardApi(): void {
+    // Test de l'API leaderboard avec n=10
+    this.http.get<any>(`${this.apiBase}/leaderboard/10`).subscribe({
+      next: (response) => {
+        console.log('=== LEADERBOARD API RESPONSE ===');
+        console.log('Raw response:', response);
+        console.log('Type:', typeof response);
+        console.log('Is Array:', Array.isArray(response));
+        if (Array.isArray(response) && response.length > 0) {
+          console.log('First item:', response[0]);
+          console.log('First item keys:', Object.keys(response[0]));
+        }
+        console.log('=================================');
+      },
+      error: (err) => {
+        console.error('Leaderboard API Error:', err);
+      }
+    });
   }
 
   switchTab(tab: 'monthly' | 'alltime'): void {
