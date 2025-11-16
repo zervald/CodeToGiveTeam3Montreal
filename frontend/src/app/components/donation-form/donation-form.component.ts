@@ -1,19 +1,41 @@
-import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NgForOf, NgIf} from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { NgForOf, NgIf } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+
+interface CreateTransactionRequest {
+  donorName: string;
+  email: string;
+  amount: number;
+  anonymous: boolean;
+}
+
+interface TransactionResponse {
+  id: number;
+  donorName: string;
+  email: string;
+  amount: number;
+  anonymous: boolean;
+  createdAt: string;
+}
 
 @Component({
   selector: 'app-donation-form',
   templateUrl: './donation-form.component.html',
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    NgForOf,
-    NgIf
-  ],
-  styleUrls: ['./donation-form.component.css']
+  imports: [FormsModule, ReactiveFormsModule, NgForOf, NgIf],
+  styleUrls: ['./donation-form.component.css'],
 })
 export class DonationFormComponent implements OnInit {
+  private http = inject(HttpClient);
+  private apiBase = environment.apiBase;
+
   presetAmounts = [25, 50, 100, 250];
   selectedAmount = 0;
   customAmount: number | null = null;
@@ -30,12 +52,11 @@ export class DonationFormComponent implements OnInit {
       anonymous: [false],
       cardNumber: ['', Validators.required],
       expiryDate: ['', Validators.required],
-      cvv: ['', Validators.required]
+      cvv: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-    // Pre-select default amount
     this.selectAmount(100);
   }
 
@@ -67,12 +88,20 @@ export class DonationFormComponent implements OnInit {
 
     const shelterNights = Math.floor(amount / 35);
     if (shelterNights > 0) {
-      impacts.push(`provide ${shelterNights} emergency shelter night${shelterNights > 1 ? 's' : ''}`);
+      impacts.push(
+        `provide ${shelterNights} emergency shelter night${
+          shelterNights > 1 ? 's' : ''
+        }`
+      );
     }
 
     const therapySessions = Math.floor(amount / 25);
     if (therapySessions > 0 && impacts.length === 0) {
-      impacts.push(`provide ${therapySessions} therapy session${therapySessions > 1 ? 's' : ''} for children`);
+      impacts.push(
+        `provide ${therapySessions} therapy session${
+          therapySessions > 1 ? 's' : ''
+        } for children`
+      );
     }
 
     if (amount >= 50) {
@@ -89,25 +118,50 @@ export class DonationFormComponent implements OnInit {
 
     this.isProcessing = true;
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    const donationData = {
-      ...this.donorForm.value,
+    // Créer la requête de transaction avec les valeurs hardcodées
+    const transactionRequest: CreateTransactionRequest = {
+      donorName: 'george',
+      email: 'george@test.com',
       amount: this.selectedAmount,
-      isRecurring: this.isRecurring,
-      timestamp: new Date().toISOString()
+      anonymous: this.donorForm.value.anonymous || false,
     };
 
-    console.log('Donation submitted:', donationData);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-API-Key': environment.apiKey,
+    });
 
-    // Reset form and show success
-    this.isProcessing = false;
-    alert(`Thank you for your ${this.isRecurring ? 'monthly ' : ''}donation of $${this.selectedAmount}!`);
+    // Appel API pour créer la transaction
+    this.http
+      .post<TransactionResponse>(
+        `${this.apiBase}/transactions`,
+        transactionRequest,
+        { headers }
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Transaction created:', response);
+          this.isProcessing = false;
+          alert(
+            `Thank you for your ${
+              this.isRecurring ? 'monthly ' : ''
+            }donation of $${this.selectedAmount}! Transaction ID: ${
+              response.id
+            }`
+          );
 
-    // Reset form
-    this.donorForm.reset();
-    this.selectedAmount = 100;
-    this.isRecurring = false;
+          // Reset form
+          this.donorForm.reset();
+          this.selectedAmount = 100;
+          this.isRecurring = false;
+        },
+        error: (err) => {
+          console.error('Error creating transaction:', err);
+          this.isProcessing = false;
+          alert(
+            'An error occurred while processing your donation. Please try again.'
+          );
+        },
+      });
   }
 }
