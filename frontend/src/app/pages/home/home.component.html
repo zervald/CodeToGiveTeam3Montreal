@@ -1,9 +1,10 @@
 <app-page [fullWidth]="true">
-
   <!-- home.component.html -->
   <div class="home-container">
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section
+      class="hero-section bg-gradient-to-r from-indigo-600 to-purple-600"
+    >
       <div class="hero-inner">
         <div class="hero-grid">
           <!-- Left column -->
@@ -14,30 +15,37 @@
             </h1>
 
             <p class="hero-sub">
-              For over three decades, Shield of Athena has been a beacon of hope for
-              families escaping violence. We provide emergency shelter, counseling
-              services, and prevention programs tailored to meet your needs.
+              For over three decades, Shield of Athena has been a beacon of hope
+              for families escaping violence. We provide emergency shelter,
+              counseling services, and prevention programs tailored to meet your
+              needs.
             </p>
 
             <p class="hero-sub">
               Our comprehensive approach addresses immediate safety needs while
-              building long-term resilience through therapy, education, and community
-              support. Every donation directly funds life-saving services and prevention
-              programs.
+              building long-term resilience through therapy, education, and
+              community support. Every donation directly funds life-saving
+              services and prevention programs.
             </p>
 
             <div class="hero-actions">
               <button class="cta-btn" (click)="onDonateClick()">
                 Support Our Mission
               </button>
-
             </div>
           </div>
 
           <!-- Right column -->
-          <div class="hero-right" role="img" aria-label="Shield of Athena supporter">
+          <div
+            class="hero-right"
+            role="img"
+            aria-label="Shield of Athena supporter"
+          >
             <div class="hero-image-card">
-              <img src="assets/images/middlepage.jpg" alt="Community member smiling" />
+              <img
+                src="assets/images/middlepage.jpg"
+                alt="Community member smiling"
+              />
             </div>
           </div>
         </div>
@@ -58,9 +66,6 @@
       </div>
     </section>
 
-
-
-
     <!-- journey-timeline Section -->
     <section class="section-wrapper bg-gray">
       <div class="section-content">
@@ -79,13 +84,6 @@
     <section class="section-wrapper bg-white">
       <div class="section-content">
         <app-quiz></app-quiz>
-      </div>
-    </section>
-
-    <!-- achievements Section -->
-    <section class="section-wrapper bg-gray">
-      <div class="section-content">
-        <app-achievements></app-achievements>
       </div>
     </section>
   </div>

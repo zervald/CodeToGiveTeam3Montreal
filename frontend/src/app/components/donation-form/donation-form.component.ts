@@ -8,8 +8,10 @@ import {
 } from '@angular/forms';
 import { NgForOf, NgIf } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { switchMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 interface CreateTransactionRequest {
   donorName: string;
@@ -27,6 +29,13 @@ interface TransactionResponse {
   createdAt: string;
 }
 
+interface Badge {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-donation-form',
   templateUrl: './donation-form.component.html',
@@ -35,6 +44,7 @@ interface TransactionResponse {
 })
 export class DonationFormComponent implements OnInit {
   private http = inject(HttpClient);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private apiBase = environment.apiBase;
 
@@ -44,15 +54,11 @@ export class DonationFormComponent implements OnInit {
   isRecurring = false;
   isProcessing = false;
   donorForm: FormGroup;
-  
-  // Authentication state
-  isLoggedIn = false;
-  userEmail = '';
-  userName = '';
-  
-  // Guest mode
-  isGuestMode = false;
-  showAuthOptions = true;
+
+  // Event-specific donation
+  eventId: number | null = null;
+  eventTitle: string | null = null;
+  isEventDonation = false;
 
   constructor(private fb: FormBuilder) {
     this.donorForm = this.fb.group({
@@ -69,57 +75,16 @@ export class DonationFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectAmount(100);
-    this.checkAuthStatus();
-  }
 
-  checkAuthStatus(): void {
-    // Check if user is logged in (using localStorage like navbar)
-    const token = localStorage.getItem('authToken');
-    const userEmail = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-    
-    if (token && userEmail) {
-      this.isLoggedIn = true;
-      this.userEmail = userEmail;
-      this.userName = userName || '';
-      this.showAuthOptions = false;
-      this.prefillUserInfo();
-    }
-  }
-
-  prefillUserInfo(): void {
-    // Pre-fill form with user information
-    if (this.userName) {
-      const nameParts = this.userName.split(' ');
-      this.donorForm.patchValue({
-        firstName: nameParts[0] || '',
-        lastName: nameParts.slice(1).join(' ') || '',
-        email: this.userEmail,
-      });
-    } else {
-      this.donorForm.patchValue({
-        email: this.userEmail,
-      });
-    }
-  }
-
-  continueAsGuest(): void {
-    this.isGuestMode = true;
-    this.showAuthOptions = false;
-  }
-
-  goToLogin(): void {
-    // Store current donation amount in session storage
-    sessionStorage.setItem('pendingDonationAmount', this.selectedAmount.toString());
-    sessionStorage.setItem('pendingDonationRecurring', this.isRecurring.toString());
-    this.router.navigate(['/login'], { queryParams: { returnUrl: '/donate' } });
-  }
-
-  goToSignup(): void {
-    // Store current donation amount in session storage
-    sessionStorage.setItem('pendingDonationAmount', this.selectedAmount.toString());
-    sessionStorage.setItem('pendingDonationRecurring', this.isRecurring.toString());
-    this.router.navigate(['/signup'], { queryParams: { returnUrl: '/donate' } });
+    // Check for event parameters
+    this.route.queryParams.subscribe((params) => {
+      if (params['eventId'] && params['eventTitle']) {
+        this.eventId = +params['eventId'];
+        this.eventTitle = params['eventTitle'];
+        this.isEventDonation = true;
+        console.log('Event donation mode:', this.eventId, this.eventTitle);
+      }
+    });
   }
 
   selectAmount(amount: number): void {
@@ -180,23 +145,28 @@ export class DonationFormComponent implements OnInit {
 
     this.isProcessing = true;
 
-    const formValue = this.donorForm.value;
-    const donorName = `${formValue.firstName} ${formValue.lastName}`;
-    
-    // Create transaction request with actual form data
-    const transactionRequest: CreateTransactionRequest = {
-      donorName: formValue.anonymous ? 'Anonymous' : donorName,
-      email: formValue.email,
-      amount: this.selectedAmount,
-      anonymous: formValue.anonymous || false,
-    };
-
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'X-API-Key': environment.apiKey,
     });
 
-    // API call to create transaction
+    if (this.isEventDonation && this.eventId) {
+      // Event-specific donation
+      this.processEventDonation(headers);
+    } else {
+      // Regular donation
+      this.processRegularDonation(headers);
+    }
+  }
+
+  private processRegularDonation(headers: HttpHeaders): void {
+    const transactionRequest: CreateTransactionRequest = {
+      donorName: 'george',
+      email: 'george@test.com',
+      amount: this.selectedAmount,
+      anonymous: this.donorForm.value.anonymous || false,
+    };
+
     this.http
       .post<TransactionResponse>(
         `${this.apiBase}/transactions`,
@@ -207,22 +177,13 @@ export class DonationFormComponent implements OnInit {
         next: (response) => {
           console.log('Transaction created:', response);
           this.isProcessing = false;
-          
-          const message = `Thank you ${formValue.anonymous ? '' : formValue.firstName} for your ${
-            this.isRecurring ? 'monthly ' : ''
-          }donation of $${this.selectedAmount}!\n\nTransaction ID: ${response.id}\n\nYou will receive a confirmation email at ${formValue.email}`;
-          
-          alert(message);
 
-          // Reset form
-          this.donorForm.reset();
-          this.selectedAmount = 100;
-          this.isRecurring = false;
-          
-          // If user was logged in, keep their info filled
-          if (this.isLoggedIn) {
-            this.prefillUserInfo();
-          }
+          this.showSuccessToast();
+
+          this.resetForm();
+
+          // Navigate to profile page
+          this.router.navigate(['/profile']);
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -232,5 +193,114 @@ export class DonationFormComponent implements OnInit {
           );
         },
       });
+  }
+
+  private processEventDonation(headers: HttpHeaders): void {
+    const donorEmail = 'george@test.com';
+
+    // Step 1: Create donation for the event
+    this.http
+      .post<any>(
+        `${this.apiBase}/events/${this.eventId}/donate`,
+        {
+          email: donorEmail,
+          amount: this.selectedAmount,
+        },
+        { headers }
+      )
+      .pipe(
+        // Step 2: Create badge for the event (if it doesn't exist)
+        switchMap((transactionResponse) => {
+          console.log('Event transaction created:', transactionResponse);
+
+          const badgeData = {
+            id: null,
+            name: this.eventTitle,
+            description: `Participated in ${this.eventTitle} event`,
+            icon: '🎯',
+          };
+
+          return this.http
+            .post<Badge>(`${this.apiBase}/badges`, badgeData, { headers })
+            .pipe(
+              catchError((err) => {
+                console.log('Badge creation response:', err);
+                // Badge might already exist, fetch all badges to find it
+                return this.http.get<Badge[]>(`${this.apiBase}/badges`).pipe(
+                  switchMap((badges) => {
+                    const existingBadge = badges.find(
+                      (b) => b.name === this.eventTitle
+                    );
+                    if (existingBadge) {
+                      return of(existingBadge);
+                    }
+                    throw new Error('Badge not found');
+                  })
+                );
+              })
+            );
+        }),
+        // Step 3: Assign badge to user
+        switchMap((badge: Badge) => {
+          console.log('Badge created/found:', badge);
+
+          // Get user ID - for now use default user ID 1
+          const userId = 1; // TODO: Get from auth service
+
+          console.log('Assigning badge', badge.id, 'to user', userId);
+
+          return this.http.post<Badge[]>(
+            `${this.apiBase}/badges/user/${userId}/assign`,
+            [badge.id],
+            { headers }
+          );
+        })
+      )
+      .subscribe({
+        next: (result) => {
+          console.log('Event donation process completed:', result);
+          this.isProcessing = false;
+
+          this.showSuccessToast();
+
+          this.resetForm();
+
+          // Navigate to profile page
+          this.router.navigate(['/profile']);
+        },
+        error: (err) => {
+          console.error('Event donation process error:', err);
+          this.isProcessing = false;
+          alert(
+            'An error occurred while processing your donation. Please try again.'
+          );
+        },
+      });
+  }
+
+  private showSuccessToast(): void {
+    const toast = document.createElement('div');
+    toast.className =
+      'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50';
+    toast.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🎉</span>
+        <div>
+          <div class="font-semibold">Thank you for your donation!</div>
+          <div class="text-sm">You've earned a new badge!</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 4000);
+  }
+
+  private resetForm(): void {
+    this.donorForm.reset();
+    this.selectedAmount = 100;
+    this.isRecurring = false;
   }
 }
