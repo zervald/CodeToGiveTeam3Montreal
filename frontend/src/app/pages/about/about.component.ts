@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PageComponent } from '../../components/page/page.component';
+import { PageComponent } from '../../../../../../../Downloads/theme-lavande-complete_6/angular-components/components/page/page.component';
 
 @Component({
   selector: 'app-about',

@@ -39,14 +39,11 @@
         </a>
 
         <button
-          routerLink="/donate"
+          (click)="navigateToDonate()"
           class="px-8 py-4 min-h-btn bg-primary-700 text-white rounded-lg font-medium hover:bg-primary-800 shadow-sm transition-all duration-200 transform hover:scale-105"
         >
           Donate Now
         </button>
-
-        <!-- N8N Voice Call Button -->
-        <app-n8n-form></app-n8n-form>
 
         <!-- Auth Buttons (if not logged in) -->
         <div *ngIf="!isLoggedIn" class="flex items-center gap-3 ml-2 border-l border-primary-300 pl-4">
@@ -201,13 +198,8 @@
         Donate Now
       </button>
 
-      <!-- N8N Voice Call Button (Mobile) -->
-      <div class="mt-2 w-full">
-        <app-n8n-form></app-n8n-form>
-      </div>
-
       <!-- Auth Buttons Mobile (if not logged in) -->
-      <div *ngIf="!isLoggedIn" class="pt-4 border-t border-gray-200 space-y-2">
+      <div *ngIf="!isLoggedIn" class="pt-4 border-t border-primary-200 space-y-2">
         <button
           (click)="openLoginModal()"
           class="w-full px-6 py-3 min-h-btn text-primary-700 border border-primary-700 rounded-lg font-medium hover:bg-primary-100 transition-all duration-200"
@@ -514,5 +506,58 @@
         </button>
       </p>
     </div>
+  </div>
+</div>
+
+<!-- Donate Modal (when not logged in) -->
+<div
+  *ngIf="isDonateModalOpen"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+  (click)="closeDonateModal()"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-primary-900 mb-3">Make a Donation</h2>
+      <p class="text-xl text-primary-700">Do you have an account?</p>
+    </div>
+
+    <!-- Options -->
+    <div class="space-y-4">
+      <!-- Sign In Button -->
+      <button
+        (click)="signInFromDonate()"
+        class="w-full py-4 px-6 bg-primary-700 hover:bg-primary-800 text-white font-bold text-lg rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 min-h-btn"
+      >
+        Yes, I have an account - Sign In
+      </button>
+
+      <!-- Sign Up Button -->
+      <button
+        (click)="signUpFromDonate()"
+        class="w-full py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white font-bold text-lg rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 min-h-btn"
+      >
+        No, I want to create an account - Sign Up
+      </button>
+
+      <!-- Guest Button -->
+      <button
+        (click)="continueAsGuest()"
+        class="w-full py-4 px-6 bg-white hover:bg-primary-50 text-primary-800 font-semibold text-lg rounded-xl border-2 border-primary-400 hover:border-primary-600 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 min-h-btn"
+      >
+        Continue as Guest
+      </button>
+    </div>
+
+    <!-- Close button -->
+    <button
+      (click)="closeDonateModal()"
+      class="mt-6 w-full text-primary-700 hover:text-primary-900 font-medium text-lg"
+    >
+      Cancel
+    </button>
   </div>
 </div>

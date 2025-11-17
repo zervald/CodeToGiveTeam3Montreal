@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageComponent } from '../../components/page/page.component';
+import { PageComponent } from '../../../../../../../Downloads/theme-lavande-complete_6/angular-components/components/page/page.component';
 import { Badge } from '../../models/badge';
 
 @Component({

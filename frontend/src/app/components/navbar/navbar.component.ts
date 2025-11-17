@@ -1,22 +1,28 @@
 // File: frontend/src/app/components/navbar/navbar.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { N8nFormComponent } from '../n8n-form/n8n-form.component';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, N8nFormComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './navbar.component.html'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
-  isLoggedIn = false; // État de connexion
+  isLoggedIn = false;
+  userName = '';
+  userEmail = '';
   isLoginModalOpen = false;
   isSignupModalOpen = false;
+
+  private authSubscription?: Subscription;
+  private userSubscription?: Subscription;
 
   // Login form data
   loginEmail = '';
@@ -33,7 +39,55 @@ export class NavbarComponent {
   signupPostalCode = '';
   signupCountry = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    // Subscribe to auth state changes
+    this.authSubscription = this.authService.isLoggedIn$.subscribe(
+      isLoggedIn => {
+        this.isLoggedIn = isLoggedIn;
+      }
+    );
+
+    // Subscribe to current user changes
+    this.userSubscription = this.authService.currentUser$.subscribe(
+      user => {
+        if (user) {
+          this.userName = user.name;
+          this.userEmail = user.email;
+        } else {
+          this.userName = '';
+          this.userEmail = '';
+        }
+      }
+    );
+
+    // Listen for custom events from donation form
+    window.addEventListener('openLoginModal', this.handleOpenLoginEvent);
+    window.addEventListener('openSignupModal', this.handleOpenSignupEvent);
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.authSubscription?.unsubscribe();
+    this.userSubscription?.unsubscribe();
+
+    // Clean up event listeners
+    window.removeEventListener('openLoginModal', this.handleOpenLoginEvent);
+    window.removeEventListener('openSignupModal', this.handleOpenSignupEvent);
+  }
+
+  // Event handlers for custom events
+  private handleOpenLoginEvent = (): void => {
+    this.openLoginModal();
+  }
+
+  private handleOpenSignupEvent = (): void => {
+    this.openSignupModal();
+  }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
@@ -43,8 +97,40 @@ export class NavbarComponent {
     this.isMenuOpen = false;
   }
 
+  // Donate modal state
+  isDonateModalOpen = false;
+
   navigateToDonate(): void {
     this.closeMenu();
+
+    if (!this.isLoggedIn) {
+      // Show donate modal asking for account
+      this.isDonateModalOpen = true;
+    } else {
+      // Go directly to donate page
+      this.router.navigate(['/donate']);
+    }
+  }
+
+  closeDonateModal(): void {
+    this.isDonateModalOpen = false;
+  }
+
+  // From donate modal -> open login modal
+  signInFromDonate(): void {
+    this.closeDonateModal();
+    this.openLoginModal();
+  }
+
+  // From donate modal -> open signup modal
+  signUpFromDonate(): void {
+    this.closeDonateModal();
+    this.openSignupModal();
+  }
+
+  // Continue as guest
+  continueAsGuest(): void {
+    this.closeDonateModal();
     this.router.navigate(['/donate']);
   }
 
@@ -66,9 +152,18 @@ export class NavbarComponent {
 
   handleLogin(): void {
     console.log('Login attempt:', { email: this.loginEmail, password: this.loginPassword });
-    // Simuler la connexion réussie
-    this.isLoggedIn = true;
+
+    // Use AuthService to handle login
+    this.authService.login(this.loginEmail, this.loginPassword);
+
     this.closeLoginModal();
+
+    // Check if there's a return URL in sessionStorage
+    const returnUrl = sessionStorage.getItem('returnUrl');
+    if (returnUrl) {
+      sessionStorage.removeItem('returnUrl');
+      this.router.navigate([returnUrl]);
+    }
   }
 
   // Signup modal methods
@@ -105,9 +200,29 @@ export class NavbarComponent {
       postalCode: this.signupPostalCode,
       country: this.signupCountry
     });
-    // Simuler l'inscription réussie
-    this.isLoggedIn = true;
+
+    // Use AuthService to handle signup
+    this.authService.signup(
+      this.signupName,
+      this.signupEmail,
+      this.signupPassword,
+      {
+        phone: this.signupPhone,
+        address: this.signupAddress,
+        city: this.signupCity,
+        postalCode: this.signupPostalCode,
+        country: this.signupCountry
+      }
+    );
+
     this.closeSignupModal();
+
+    // Check if there's a return URL in sessionStorage
+    const returnUrl = sessionStorage.getItem('returnUrl');
+    if (returnUrl) {
+      sessionStorage.removeItem('returnUrl');
+      this.router.navigate([returnUrl]);
+    }
   }
 
   // Switch between modals
@@ -123,8 +238,7 @@ export class NavbarComponent {
 
   // Logout method
   handleLogout(): void {
-    console.log('User logged out');
-    this.isLoggedIn = false;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 }
