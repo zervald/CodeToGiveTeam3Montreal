@@ -364,8 +364,6 @@
 
 /* Hero Section - Blue gradient background */
 .hero-section {
-  background: radial-gradient(1200px 500px at 20% 40%, rgba(255,255,255,0.03), transparent),
-              linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
   color: white;
   padding: 80px 0;
   overflow: hidden;
