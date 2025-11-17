@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { NgForOf, NgIf } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -45,6 +45,7 @@ interface Badge {
 export class DonationFormComponent implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private apiBase = environment.apiBase;
 
   presetAmounts = [25, 50, 100, 250];
@@ -81,11 +82,7 @@ export class DonationFormComponent implements OnInit {
         this.eventId = +params['eventId'];
         this.eventTitle = params['eventTitle'];
         this.isEventDonation = true;
-        console.log(
-          'Event donation mode:',
-          this.eventId,
-          this.eventTitle
-        );
+        console.log('Event donation mode:', this.eventId, this.eventTitle);
       }
     });
   }
@@ -180,15 +177,13 @@ export class DonationFormComponent implements OnInit {
         next: (response) => {
           console.log('Transaction created:', response);
           this.isProcessing = false;
-          alert(
-            `Thank you for your ${
-              this.isRecurring ? 'monthly ' : ''
-            }donation of $${this.selectedAmount}! Transaction ID: ${
-              response.id
-            }`
-          );
+
+          this.showSuccessToast();
 
           this.resetForm();
+
+          // Navigate to profile page
+          this.router.navigate(['/profile']);
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -268,11 +263,10 @@ export class DonationFormComponent implements OnInit {
 
           this.showSuccessToast();
 
-          alert(
-            `Thank you for your donation of $${this.selectedAmount} to ${this.eventTitle}! You've earned a new badge!`
-          );
-
           this.resetForm();
+
+          // Navigate to profile page
+          this.router.navigate(['/profile']);
         },
         error: (err) => {
           console.error('Event donation process error:', err);

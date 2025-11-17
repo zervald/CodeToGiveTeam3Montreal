@@ -15,20 +15,18 @@ import { JourneyTimelineComponent } from '../../components/journey-timeline/jour
     PageComponent,
     AchievementsComponent,
     LeaderboardComponent,
-    JourneyTimelineComponent
+    JourneyTimelineComponent,
   ],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrls: ['./profile.component.css'],
 })
 export class ProfileComponent {
   // Données utilisateur exemple
   user = {
     name: 'Jean Dupont',
     email: 'jean.dupont@email.com',
-    memberSince: 'Janvier 2024',
     totalDonations: 1250,
     donationCount: 15,
     currentStreak: 3,
-    level: 'Gold Donor'
   };
 }
